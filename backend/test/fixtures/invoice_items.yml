@@ -1,0 +1,19 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  description: MyString
+  quantity: 9.99
+  unit_price: 9.99
+  discount: 9.99
+  tax_rate: 9.99
+  tax_base: 9.99
+  invoice_id: 1
+
+two:
+  description: MyString
+  quantity: 9.99
+  unit_price: 9.99
+  discount: 9.99
+  tax_rate: 9.99
+  tax_base: 9.99
+  invoice_id: 1
