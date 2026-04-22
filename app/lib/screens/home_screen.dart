@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 import '../services/auth_service.dart';
 import 'login_screen.dart';
 import 'add_invoice_screen.dart';
@@ -31,6 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Widget> get _pages => [
     _DashboardPage(user: _user),
     _InvoicesPage(user: _user),
+    const _ScannerPage(),
     const _StatisticsPage(),
     ProfileScreen(user: _user, onUserUpdated: _onUserUpdated),
   ];
@@ -61,8 +63,9 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               _navTab('Domov', Icons.home, 0),
               _navTab('Faktúry', Icons.receipt_long, 1),
-              _navTab('Štatistika', Icons.bar_chart, 2),
-              _navTab('Profil', Icons.person, 3),
+              _navTab('Skener', Icons.qr_code_scanner, 2),
+              _navTab('Štatistika', Icons.bar_chart, 3),
+              _navTab('Profil', Icons.person, 4),
             ],
           ),
         ),
@@ -122,7 +125,7 @@ class _DashboardPage extends StatelessWidget {
           const Icon(Icons.account_circle, size: 72, color: Colors.indigo),
           const SizedBox(height: 16),
           Text(
-            'Vitaj, ${user['name']}!',
+            'Vitaj, ${user['first_name']} ${user['last_name']}!',
             style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
@@ -319,6 +322,143 @@ class _StatisticsPage extends StatelessWidget {
           Text('Štatistika', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
         ],
       ),
+    );
+  }
+}
+
+class _ScannerPage extends StatefulWidget {
+  const _ScannerPage();
+
+  @override
+  State<_ScannerPage> createState() => _ScannerPageState();
+}
+
+class _ScannerPageState extends State<_ScannerPage> {
+  final MobileScannerController _controller = MobileScannerController();
+  String? _scannedValue;
+  bool _hasScanned = false;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _onDetect(BarcodeCapture capture) {
+    if (_hasScanned) return;
+    final barcode = capture.barcodes.firstOrNull;
+    if (barcode?.rawValue != null) {
+      setState(() {
+        _scannedValue = barcode!.rawValue;
+        _hasScanned = true;
+      });
+      _controller.stop();
+    }
+  }
+
+  void _reset() {
+    setState(() {
+      _scannedValue = null;
+      _hasScanned = false;
+    });
+    _controller.start();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Expanded(
+          flex: 3,
+          child: _hasScanned
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.check_circle, size: 72, color: Colors.green),
+                      const SizedBox(height: 16),
+                      const Text('QR kód naskenovaný!', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                )
+              : Stack(
+                  children: [
+                    MobileScanner(
+                      controller: _controller,
+                      onDetect: _onDetect,
+                    ),
+                    Center(
+                      child: Container(
+                        width: 250,
+                        height: 250,
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.indigo, width: 3),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                    const Positioned(
+                      bottom: 16,
+                      left: 0,
+                      right: 0,
+                      child: Text(
+                        'Namierte kameru na QR kód',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.white, fontSize: 14),
+                      ),
+                    ),
+                  ],
+                ),
+        ),
+        Expanded(
+          flex: 2,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Výsledok', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                Expanded(
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade100,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.grey.shade300),
+                    ),
+                    child: SingleChildScrollView(
+                      child: Text(
+                        _scannedValue ?? 'Zatiaľ nič nenaskenované...',
+                        style: TextStyle(
+                          color: _scannedValue != null ? Colors.black : Colors.grey,
+                          fontFamily: 'monospace',
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: _reset,
+                    icon: const Icon(Icons.qr_code_scanner),
+                    label: const Text('Skenovať znovu'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.indigo,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
