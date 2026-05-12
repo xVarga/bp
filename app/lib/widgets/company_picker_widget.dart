@@ -217,6 +217,7 @@ class _CompanyFormDialogState extends State<_CompanyFormDialog> {
   late final TextEditingController _firstNameController;
   late final TextEditingController _lastNameController;
   late final TextEditingController _streetController;
+  late final TextEditingController _cityController;
   late final TextEditingController _zipController;
   late final TextEditingController _countryController;
   late final TextEditingController _icoController;
@@ -238,6 +239,7 @@ class _CompanyFormDialogState extends State<_CompanyFormDialog> {
     _firstNameController = TextEditingController(text: e?['first_name'] ?? '');
     _lastNameController = TextEditingController(text: e?['last_name'] ?? '');
     _streetController = TextEditingController(text: e?['street'] ?? '');
+    _cityController = TextEditingController(text: e?['city'] ?? '');
     _zipController = TextEditingController(text: e?['zip'] ?? '');
     _countryController = TextEditingController(text: e?['country'] ?? '');
     _icoController = TextEditingController(text: e?['ico'] ?? '');
@@ -261,6 +263,7 @@ class _CompanyFormDialogState extends State<_CompanyFormDialog> {
         'first_name': _isCompany ? null : _firstNameController.text,
         'last_name': _isCompany ? null : _lastNameController.text,
         'street': _streetController.text,
+        'city': _cityController.text,
         'zip': _zipController.text,
         'country': _countryController.text,
         'ico': _icoController.text,
@@ -409,6 +412,11 @@ class _CompanyFormDialogState extends State<_CompanyFormDialog> {
               TextFormField(
                 controller: _streetController,
                 decoration: const InputDecoration(labelText: 'Ulica', border: OutlineInputBorder()),
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: _cityController,
+                decoration: const InputDecoration(labelText: 'Mesto', border: OutlineInputBorder()),
               ),
               const SizedBox(height: 12),
               Row(

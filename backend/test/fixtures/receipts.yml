@@ -1,0 +1,25 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user_id: 1
+  merchant_name: MyString
+  merchant_address: MyString
+  dic: MyString
+  ic_dph: MyString
+  ico: MyString
+  cash_register_code: MyString
+  receipt_number: MyString
+  issued_at: 2026-05-04 16:49:01
+  total_amount: 9.99
+
+two:
+  user_id: 1
+  merchant_name: MyString
+  merchant_address: MyString
+  dic: MyString
+  ic_dph: MyString
+  ico: MyString
+  cash_register_code: MyString
+  receipt_number: MyString
+  issued_at: 2026-05-04 16:49:01
+  total_amount: 9.99

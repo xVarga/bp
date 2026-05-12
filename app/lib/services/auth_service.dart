@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
   //10.0.2.2 localhost 192.168.1.67
-  static const String baseUrl = 'http://192.168.1.67:3000/api/v1';
+  static const String baseUrl = 'http://10.0.2.2:3000/api/v1';
 
   Future<Map<String, dynamic>> signup({
     required String firstName,
@@ -258,8 +258,90 @@ class AuthService {
     }
   }
 
+  Future<List<dynamic>> getReceipts() async {
+    final token = await getToken();
+    final response = await http.get(
+      Uri.parse('$baseUrl/receipts'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+    if (response.statusCode == 200) return jsonDecode(response.body);
+    return [];
+  }
+
+  Future<Map<String, dynamic>> getReceipt(int id) async {
+    final token = await getToken();
+    final response = await http.get(
+      Uri.parse('$baseUrl/receipts/$id'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+    if (response.statusCode == 200) {
+      return {'success': true, 'receipt': jsonDecode(response.body)};
+    } else {
+      return {'success': false, 'error': 'Bloček nenájdený'};
+    }
+  }
+
+  Future<Map<String, dynamic>> createReceipt(Map<String, dynamic> body) async {
+    final token = await getToken();
+    final response = await http.post(
+      Uri.parse('$baseUrl/receipts'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(body),
+    );
+    final data = jsonDecode(response.body);
+    if (response.statusCode == 201) return {'success': true, 'receipt': data};
+    return {'success': false, 'error': (data['errors'] as List?)?.join(', ') ?? 'Chyba pri ukladaní'};
+  }
+
+  Future<bool> deleteReceipt(int id) async {
+    final token = await getToken();
+    final response = await http.delete(
+      Uri.parse('$baseUrl/receipts/$id'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+    return response.statusCode == 200;
+  }
+
   Future<void> _saveToken(String token) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('auth_token', token);
+  }
+
+  Future<Map<String, dynamic>> findEkasaReceipt(String receiptId) async {
+    final token = await getToken();
+    final response = await http.post(
+      Uri.parse('$baseUrl/ekasa/find'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({'receiptId': receiptId}),
+    );
+    return jsonDecode(response.body);
+  }
+
+  Future<Map<String, dynamic>> decodeBysquare(String payload) async {
+    final token = await getToken();
+    final response = await http.post(
+      Uri.parse('$baseUrl/bysquare/decode'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({'payload': payload}),
+    );
+    return jsonDecode(response.body);
   }
 }

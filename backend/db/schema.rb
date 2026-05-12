@@ -10,11 +10,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_08_163005) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_12_230124) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
   create_table "companies", force: :cascade do |t|
+    t.boolean "archived", default: false
+    t.string "city"
     t.string "company_name"
     t.string "country"
     t.datetime "created_at", null: false
@@ -47,6 +49,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_08_163005) do
     t.boolean "art", default: false
     t.boolean "collectibles", default: false
     t.datetime "created_at", null: false
+    t.string "currency"
     t.integer "customer_id"
     t.date "delivery_date"
     t.string "invoice_number"
@@ -65,6 +68,31 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_08_163005) do
     t.integer "user_id"
     t.boolean "vat_exempt", default: false
     t.integer "version", default: 1
+  end
+
+  create_table "receipt_items", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "description"
+    t.decimal "quantity"
+    t.integer "receipt_id"
+    t.decimal "total_price"
+    t.decimal "unit_price"
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "receipts", force: :cascade do |t|
+    t.string "cash_register_code"
+    t.datetime "created_at", null: false
+    t.string "dic"
+    t.string "ic_dph"
+    t.string "ico"
+    t.datetime "issued_at"
+    t.string "merchant_address"
+    t.string "merchant_name"
+    t.string "receipt_number"
+    t.decimal "total_amount"
+    t.datetime "updated_at", null: false
+    t.integer "user_id"
   end
 
   create_table "users", force: :cascade do |t|

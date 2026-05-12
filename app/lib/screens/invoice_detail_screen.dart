@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import 'add_invoice_screen.dart';
+import '../utils/date_formatter.dart';
+
 
 class InvoiceDetailScreen extends StatefulWidget {
     final int invoiceId;
@@ -95,13 +97,11 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
     if (confirm != true) return;
     await _authService.cancelInvoice(id);
     await _loadInvoice();
-    }   
+    }
 
     bool get _isLatestVersion {
         if (_invoice == null || _history.isEmpty) return true;
-        final maxVersion = _history
-            .map((v) => v['version'] as int)
-            .reduce((a, b) => a > b ? a : b);
+        final maxVersion = _history.map((v) => v['version'] as int).reduce((a, b) => a > b ? a : b);
         return _invoice!['version'] == maxVersion;
     }
 
@@ -194,8 +194,8 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
 
             _sectionTitle('Základné informácie'),
             _infoRow('Číslo faktúry', invoice['invoice_number']),
-            _infoRow('Dátum vyhotovenia', invoice['issue_date']),
-            _infoRow('Dátum dodania', invoice['delivery_date']),
+            _infoRow('Dátum vyhotovenia', formatDate(invoice['issue_date'])),
+            _infoRow('Dátum dodania', formatDate(invoice['delivery_date'])),
             _infoRow('Celková suma bez DPH', '${invoice["total_without_vat"]} €'),
             _infoRow('DPH', '${invoice["total_vat_amount"]} €'),
             _infoRow('Celková suma s DPH', '${invoice["total_with_vat"]} €'),
@@ -208,7 +208,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
         );
     }
 
-    Widget _buildHistory() {
+Widget _buildHistory() {
         if (_history.isEmpty) {
         return const Center(
             child: Text('Žiadna história', style: TextStyle(color: Colors.grey)),
@@ -293,7 +293,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                            'Vyhotovenie: ${v['issue_date']} | DPH: ${v['total_vat_amount']} €',
+                            'Vyhotovenie: ${formatDate(v['issue_date'])} | DPH: ${v['total_vat_amount']} €',
                             style: const TextStyle(color: Colors.grey, fontSize: 13),
                             ),
                         ],
@@ -338,7 +338,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
         ),
     );
 
-    Widget _boolRow(String label, dynamic value) => Padding(
+    /*Widget _boolRow(String label, dynamic value) => Padding(
         padding: const EdgeInsets.symmetric(vertical: 2),
         child: Row(
         children: [
@@ -351,7 +351,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
             Text(label),
         ],
         ),
-    );
+    );*/
 
     Widget _itemCard(int index, Map<String, dynamic> item) => Card(
         margin: const EdgeInsets.only(bottom: 12),

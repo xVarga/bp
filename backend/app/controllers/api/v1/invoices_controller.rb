@@ -90,8 +90,8 @@ module Api
         all_versions = collect_versions(root)
         
         render json: all_versions.sort_by { |v| v.version }.map { |v| invoice_json(v) }
-      rescue ActiveRecord::RecordNotFound
-        render json: { error: 'Faktúra nenájdená' }, status: :not_found
+        rescue ActiveRecord::RecordNotFound
+          render json: { error: 'Faktúra nenájdená' }, status: :not_found
       end
 
       private
@@ -108,7 +108,7 @@ module Api
       def invoice_params
         params.require(:invoice).permit(
           :invoice_number, :issue_date, :delivery_date, :total_vat_amount,
-          :total_without_vat, :total_with_vat,
+          :total_without_vat, :total_with_vat, :currency,
           :supplier_id, :customer_id,
           :self_billed, :reverse_charge,
           :travelling_agency, :used_item, :art, :collectibles,
@@ -128,6 +128,7 @@ module Api
           total_vat_amount: invoice.total_vat_amount,
           total_without_vat: invoice.total_without_vat,
           total_with_vat: invoice.total_with_vat,
+          currency: invoice.currency,
           is_cancelled: invoice.is_cancelled,
           version: invoice.version,
           self_billed: invoice.self_billed,
@@ -140,6 +141,7 @@ module Api
             id: invoice.supplier.id,
             company_name: invoice.supplier.company_name,
             street: invoice.supplier.street,
+            city: invoice.supplier.city,
             zip: invoice.supplier.zip,
             country: invoice.supplier.country,
             ico: invoice.supplier.ico,
@@ -150,6 +152,7 @@ module Api
             id: invoice.customer.id,
             company_name: invoice.customer.company_name,
             street: invoice.customer.street,
+            city: invoice.customer.city,
             zip: invoice.customer.zip,
             country: invoice.customer.country,
             ico: invoice.customer.ico,

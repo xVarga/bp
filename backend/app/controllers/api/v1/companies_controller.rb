@@ -5,7 +5,7 @@ module Api
 
             # GET /api/v1/companies
             def index
-                companies = @current_user.companies
+                companies = @current_user.companies.where(archived: false)
                 render json: companies.map { |c| company_json(c) }
             end
 
@@ -29,21 +29,21 @@ module Api
 
             # PUT /api/v1/companies/:id
             def update
-                company = @current_user.companies.find(params[:id])
-                if company.update(company_params)
-                render json: company_json(company)
+                old_company = @current_user.companies.find(params[:id])
+                old_company.update(archived: true)
+                new_company = @current_user.companies.create(company_params)
+                if new_company.persisted?
+                    render json: company_json(new_company), status: :created
                 else
-                render json: { errors: company.errors.full_messages }, status: :unprocessable_entity
+                    render json: { errors: new_company.errors.full_messages }, status: :unprocessable_entity
                 end
-                rescue ActiveRecord::RecordNotFound
-                render json: { error: 'Firma nenájdená' }, status: :not_found
             end
 
             private
 
             def company_params
                 params.require(:company).permit(
-                :company_name, :street, :zip, :country,
+                :company_name, :street, :zip, :city, :country,
                 :ico, :dic, :ic_dph
                 )
             end
@@ -54,6 +54,7 @@ module Api
                 company_name: company.company_name,
                 street: company.street,
                 zip: company.zip,
+                city: company.city,
                 country: company.country,
                 ico: company.ico,
                 dic: company.dic,

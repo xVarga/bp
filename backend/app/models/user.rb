@@ -8,6 +8,7 @@ class User < ApplicationRecord
 
   has_many :invoices
   has_many :companies
+  has_many :receipts
 
   def full_name
     "#{first_name} #{last_name}"
